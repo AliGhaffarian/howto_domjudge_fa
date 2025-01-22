@@ -51,10 +51,17 @@ domserver
 `"systemd.unified_cgroup_hierarchy=0 cgroup_enable=memory swapaccount=1 isolcpus=2 SYSTEMD_CGROUP_ENABLE_LEGACY_FORCE=1"` 
 تغییر بدین، و بعد از ریبوت:
 
+ پسورد جاج هوست رو از دام سرور بگیرین  
 ```bash
-docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver --hostname judgedaemon-0 -e DAEMON_ID=0 domjudge/judgehost:latest
+docker exec -it domserver cat /opt/domjudge/domserver/etc/restapi.secret
 ```
-## اضافه کردن judgehost بیشتر
+
+
+ و در اخر برای ران شدن جاج هوست(`<judgehost-password>` رو با پسوردی که گرفتین توی مرحله قبلی جایگزین کنین):
+```bash
+sudo docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver -e JUDGEDAEMON_PASSWORD='<judgehost-password>' --hostname judgedaemon-0 -e DAEMON_ID=0 domjudge/judgehost:latest
+```
+ 
 ## فایروال
 از اونجایی که بازیکن ها فقط نیاز دارن که با وب سرور تعامل کنن، پیشنهاد میکنم که پورت 13306 (دیتابیس) رو ببندین
 
@@ -74,6 +81,7 @@ iptables -A INPUT -p tcp --dport 13306 -i <interface_name> -j DROP
 ### DHCP
 
 ### دستورالعمل برای مواقع بحرانی
+##  گرفتن شل از کانتینری که بالا نمیاد
 #### بازیابی پسورد ادمین
 #### بازیابی پسورد بازیکن
 ## پنل ادمین
@@ -96,3 +104,5 @@ iptables -A INPUT -p tcp --dport 13306 -i <interface_name> -j DROP
 https://hub.docker.com/r/domjudge/domserver/
 https://www.domjudge.org/docs/manual/8.2/index.html
 https://icpc.io/problem-package-format/spec/legacy-icpc
+https://www.domjudge.org/docs/manual/8.2/problem-format.html
+
