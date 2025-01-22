@@ -49,8 +49,7 @@ domserver
  GRUB_CMDLINE_LINUX_DEFAULT 
  رو به 
 `"systemd.unified_cgroup_hierarchy=0 cgroup_enable=memory swapaccount=1 isolcpus=2 SYSTEMD_CGROUP_ENABLE_LEGACY_FORCE=1"` 
-تغییر بدین، و بعد:
-```
+تغییر بدین، و بعد از ریبوت:
 
 ```bash
 docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver --hostname judgedaemon-0 -e DAEMON_ID=0 domjudge/judgehost:latest
