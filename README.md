@@ -11,9 +11,10 @@ domjudge
 اگه اشتباهی مشاهده کردین و یا معتقدین سرفصلی باید اضافه شه، ایشو بزنین و یا بهتر از اون، درستش کنین و پول ریکوءست بزنین.
 
 ## پیشنیاز های نرم افزاری
-docker
-[libcgroup](https://aur.archlinux.org/pkgbase/libcgroup)
-بدون داکر هم میشه دام جاج رو ستاپ کرد که خارج از این داکیومنته
+1. docker
+2. [libcgroup](https://aur.archlinux.org/pkgbase/libcgroup)  
+
+بدون داکر هم میشه دام جاج رو ستاپ کرد که خارج از این داکیومنته  
 مشخصات سیستمی که خودم این آموزش رو تست کردم
 ```
 Kernel: 6.12.4-arch1-1 
@@ -31,14 +32,14 @@ OS: Arch Linux x86_64
 ```bash
 docker run -it --name dj-mariadb -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_USER=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_DATABASE=domjudge -p 13306:3306 mariadb --max-connections=1000
 ```
-### domjudge/domserver
+## domjudge/domserver
 ```bash
 docker run --link dj-mariadb:mariadb -it -e MYSQL_HOST=mariadb -e MYSQL_USER=domjudge -e MYSQL_DATABASE=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_ROOT_PASSWORD=rootpw -p 80:80 --name domserver domjudge/domserver:latest
 ```
 بعد بالا اومدن 
 domserver
 میتونین به http://localhost:80 برین و به عنوان ادمین لاگین کنین
-### domjudge/judgehost
+## domjudge/judgehost
 
  برای اینکه 
  judgehost 
@@ -54,11 +55,12 @@ domserver
 ```bash
 docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver --hostname judgedaemon-0 -e DAEMON_ID=0 domjudge/judgehost:latest
 ```
-#### اضافه کردن judgehost بیشتر
-### فایروال
+## اضافه کردن judgehost بیشتر
+## فایروال
 از اونجایی که بازیکن ها فقط نیاز دارن که با وب سرور تعامل کنن، پیشنهاد میکنم که پورت 13306 (دیتابیس) رو ببندین
 
-بستن این پورت با iptables:
+
+**بستن این پورت با iptables**:  
 به جای 
 <interface_name>
  اسم پورتی که به شبکه بازیکن ها وصل هست رو بنویسین
