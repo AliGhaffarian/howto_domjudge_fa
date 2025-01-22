@@ -101,8 +101,8 @@ iptables -A INPUT -p tcp --dport 13306 -i <interface_name> -j DROP
 - docker container start judgehost-0
 - بستن پورت دیتابیس
 ## مطالعه بیشتر
-https://hub.docker.com/r/domjudge/domserver/
-https://www.domjudge.org/docs/manual/8.2/index.html
-https://icpc.io/problem-package-format/spec/legacy-icpc
-https://www.domjudge.org/docs/manual/8.2/problem-format.html
+- https://hub.docker.com/r/domjudge/domserver/
+- https://www.domjudge.org/docs/manual/8.2/index.html
+- https://icpc.io/problem-package-format/spec/legacy-icpc
+- https://www.domjudge.org/docs/manual/8.2/problem-format.html
 
