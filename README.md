@@ -26,18 +26,38 @@ Kernel: 6.1.0-30-amd64
 
 
 # بالا آوردن دام جاج
-# mariadb
+## mariadb
 ```bash
-docker run -it --name dj-mariadb -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_USER=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_DATABASE=domjudge -p 13306:3306 mariadb --max-connections=1000
+docker run -it --name dj-mariadb \
+-e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_USER=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_DATABASE=domjudge \
+-p 13306:3306 mariadb \
+--max-connections=1000
 ```
-# domjudge/domserver
+## domjudge/domserver
 ```bash
-docker run --link dj-mariadb:mariadb -it -e MYSQL_HOST=mariadb -e MYSQL_USER=domjudge -e MYSQL_DATABASE=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_ROOT_PASSWORD=rootpw -p 80:80 --name domserver domjudge/domserver:latest
+docker run --link dj-mariadb:mariadb -it \
+-e MYSQL_HOST=mariadb -e MYSQL_USER=domjudge -e MYSQL_DATABASE=domjudge -e MYSQL_PASSWORD=djpw -e MYSQL_ROOT_PASSWORD=rootpw \
+-p 80:80 \
+--name domserver domjudge/domserver:latest
 ```
 بعد بالا اومدن 
 domserver
 میتونین به http://localhost:80 برین و به عنوان ادمین لاگین کنین.
-# domjudge/judgehost
+
+### هشدار های مربوط به دیتابیس
+دام سرور بهتون هشدار میده که یسری پارامترای دیتابیس بد تنظیم شدن(هشدار‌های مربوط به تنظیمات دام جاج رو از http://domserver/jury/config/check میتونین چک کنین). 
+برای رفع این هشدار‌ها میتونین:  
+1. از کانتینر دیتابیس‌تون شل بگیرین:  
+```bash
+docker exec -it dj-mariadb bash
+```
+2. 
+```bash
+echo 'innodb_log_file_size = 512M
+max_allowed_packet = 100M' > /etc/mysql/my.cnf
+```
+
+## domjudge/judgehost
 
 - داخل فایل 
  `/etc/default/grub` 
@@ -57,9 +77,12 @@ docker exec -it domserver cat /opt/domjudge/domserver/etc/restapi.secret
 
 - و در اخر برای ران شدن جاج هوست(`<judgehost-password>` رو با پسوردی که گرفتین توی مرحله قبلی جایگزین کنین):
 ```bash
-docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver -e JUDGEDAEMON_PASSWORD='<judgehost-password>' --hostname judgedaemon-0 -e DAEMON_ID=0 domjudge/judgehost:latest
+docker run -it --privileged \
+-v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver \
+-e JUDGEDAEMON_PASSWORD='<judgehost-password>' -e DAEMON_ID=0\
+--hostname judgedaemon-0 domjudge/judgehost:latest
 ```
- 
+
 # فایروال
 از اونجایی که بازیکن‌ها فقط نیاز دارن که با وب سرور تعامل کنن، پیشنهاد میکنم که پورت 13306 (دیتابیس) رو ببندین، در غیر این صورت حتما موقع بالا آوردن دیتابیس و دام سرور پسورد دیتابیس رو تغییر بدین.  
 
@@ -76,20 +99,22 @@ iptables -A INPUT -p tcp --dport 13306 -i <interface_name> -j DROP
 
 برای همین موضوع پیشنهاد میکنم که اگه فقط با این داکیومنت از دام جاج استفاده میکنین ،مسابقه تون رو روی شبکه بیسیم میزبانی نکنین و یا اگر مجبورین، برای شبکه بیسیمتون رمز بزارین و پسورد رو به بازیکن‌ها بدین، این باعث میشه فضولی بازیکن‌ها یکم دانش بیشتری بخواد :). 
 
-## دستورالعمل برای مواقع خاص
+# دستورالعمل برای مواقع خاص
 
-### ریست کردن پسورد یوزر
+## ریست کردن پسورد یوزر
 ```bash
 docker exec -i domserver /opt/domjudge/domserver/webapp/bin/console domjudge:reset-user-password '<username>'
 ```
-### بازیابی پسورد اولیه ادمین
+## بازیابی پسورد اولیه ادمین
 ```bash
 docker exec -it domserver cat /opt/domjudge/domserver/etc/initial_admin_password.secret
 ```
-### بازیابی پسورد اولیه جاج هوست
+## بازیابی پسورد اولیه جاج هوست
 ```bash
 docker exec -it domserver cat /opt/domjudge/domserver/etc/restapi.secret
 ```
+
+
 # پنل ادمین
 ## اضافه کردن مسابقه
 لینک پنل:
@@ -145,7 +170,7 @@ http://domserver/jury/contests
 ├── problem.pdf
 └── problem.yaml
 ```
-
+**نکات**:  
 - پیش میاد که هر دو فایل از اپشن خاصی استفاده کنن که اینجا در موردشون صحبت نشده.
 - فایل های `problem.yaml` و تست کیس ها اجباری هستن.
 
@@ -201,27 +226,18 @@ http://domserver/jury/rejudgings
 ### اضافه کردن یوزر
 لینک پنل:
 http://domserver/jury/users  
-موقع اضافه کردن بازیکن ها، تیک team member رو بزنین.  
-هر یوزر برای اینکه بتونه به سوالات جواب بده باید توسط ادمین عضو تیمی شده باشه.
+
+**نکات**:  
+- موقع اضافه کردن بازیکن ها، تیک team member رو بزنین.  
+- هر یوزر برای اینکه بتونه به سوالات جواب بده باید توسط ادمین عضو تیمی شده باشه.
 ### اضافه کردن تیم
 لینک پنل:
 http://domserver/jury/teams  
 از داخل این پنل میتونین یک پلیر عضو این تیم کنین و این اپشن هم وجود داره که همون لحظه یوزر جدید برای اون تیم درست کنین، که برای مسابقانی که هر تیم یک دستگاه داره خیلی ایده‌آله و دیگه نیازی نیست جداگانه یوزر رجیستر کنن.
-### هشدار های مربوط به دیتابیس
-دام سرور بهتون هشدار میده که یسری پارامترای دیتابیس بد تنظیم شدن(هشدار‌های مربوط به تنظیمات دام جاج رو از http://domserver/jury/config/check میتونین چک کنین). 
-برای رفع این هشدار‌ها میتونین:  
-1. از کانتینر دیتابیس‌تون شل بگیرین:  
-```bash
-docker exec -it dj-mariadb bash
-```
-2. 
-```bash
-echo 'innodb_log_file_size = 512M
-max_allowed_packet = 100M' > /etc/mysql/my.cnf
-```
-## اطلاع رسانی حین مسابقه
+### اطلاع رسانی حین مسابقه
 لینک پنل:
 http://domserver/jury/clarifications/send  
+
 
 # چک لیست برای شروع مسابقه
 این یک چک لیست کوچولو هستش برای اینکه روز برگزاری مسابقه، چیزی رو از قلم نندازین :)
