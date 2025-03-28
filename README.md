@@ -80,7 +80,7 @@ docker exec -it domserver cat /opt/domjudge/domserver/etc/restapi.secret
 docker run -it --privileged \
 -v /sys/fs/cgroup:/sys/fs/cgroup --name judgehost-0 --link domserver:domserver \
 -e JUDGEDAEMON_PASSWORD='<judgehost-password>' -e DAEMON_ID=0\
---hostname judgedaemon-0 domjudge/judgehost:latest
+ --hostname judgedaemon-0 domjudge/judgehost:latest
 ```
 
 # فایروال
